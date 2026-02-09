@@ -10,6 +10,7 @@ WORKDIR /app
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
         ca-certificates curl git \
         ffmpeg sox libsox-fmt-all \
+        libsndfile1 \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 

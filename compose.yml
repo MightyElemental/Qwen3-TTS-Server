@@ -9,14 +9,27 @@ services:
       - "8000:8000"
 
     environment:
-      # Optional overrides
       HOST: "0.0.0.0"
       PORT: "8000"
       WORKERS: "1"
-      # HF_TOKEN: "${HF_TOKEN}"  # if needed for private repos
+
+      # Data persistence
+      DATA_DIR: "/app/data"
+      DB_PATH: "/app/data/db.sqlite3"
+      MEDIA_DIR: "/app/data/media"
+
+      # Security (SET THESE)
+      HMAC_SECRET: "${HMAC_SECRET}"
+      ADMIN_TOKEN: "${ADMIN_TOKEN}"
+
+      # Models
+      MODELS_DIR: "/app/models"
+      MODEL_BASE_REPO: "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
+      MODEL_VOICEDESIGN_REPO: "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
 
     volumes:
       - ./models:/app/models
+      - ./data:/app/data
 
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:8000/health || exit 1"]
