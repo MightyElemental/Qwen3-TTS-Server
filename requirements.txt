@@ -1,0 +1,5 @@
+huggingface_hub[cli]
+fastapi
+uvicorn
+ffmpeg-python
+qwen-tts
