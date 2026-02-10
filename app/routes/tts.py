@@ -78,7 +78,7 @@ def tts(
     out_wavs, sr = model_registry.base.generate_voice_clone(
         text=text,
         language=language,
-        voice_clone_prompt=prompt,
+        voice_clone_prompt=[prompt],
     )
     latency_ms = int((time.perf_counter() - t0) * 1000)
 
@@ -172,7 +172,7 @@ def batchtts(
     out_wavs, sr = model_registry.base.generate_voice_clone(
         text=texts,                     # batch list supported by Qwen3-TTS
         language=[language] * len(texts),
-        voice_clone_prompt=prompt,
+        voice_clone_prompt=[prompt],
     )
     latency_ms_total = int((time.perf_counter() - t0) * 1000)
 

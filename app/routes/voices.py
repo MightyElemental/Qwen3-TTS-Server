@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 import soundfile as sf
+from qwen_tts import VoiceClonePromptItem
 
 from app.core.auth import get_current_user, get_settings
 from app.core.config import Settings
@@ -92,12 +93,12 @@ async def clonevoice(
     if model_registry.base is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
 
-    prompt_obj = model_registry.base.create_voice_clone_prompt(
+    prompt_obj: list[VoiceClonePromptItem] = model_registry.base.create_voice_clone_prompt(
         ref_audio=audio.path,
         ref_text=transcript,
         x_vector_only_mode=False,
     )
-    prompt_blob = model_registry.dump_prompt(prompt_obj)
+    prompt_blob = model_registry.dump_prompt(prompt_obj[0])
 
     voice = Voice(
         user_id=user.id,
@@ -167,12 +168,12 @@ def designvoice(
         raise HTTPException(status_code=500, detail="ID missing")
 
     # 2) Compute clone prompt blob from the reference audio + reference text
-    prompt_obj = model_registry.base.create_voice_clone_prompt(
+    prompt_obj: list[VoiceClonePromptItem] = model_registry.base.create_voice_clone_prompt(
         ref_audio=audio.path,
         ref_text=STANDARD_EN_REFERENCE_SCRIPT,
         x_vector_only_mode=False,
     )
-    prompt_blob = model_registry.dump_prompt(prompt_obj)
+    prompt_blob = model_registry.dump_prompt(prompt_obj[0])
 
     voice = Voice(
         user_id=user.id,

@@ -53,16 +53,16 @@ class ModelRegistry:
             self.voice_design = Qwen3TTSModel.from_pretrained(voice_design_dir)
         self.loaded = True
 
-    def dump_prompt(self, prompt_obj: Any) -> bytes:
+    def dump_prompt(self, prompt_obj: VoiceClonePromptItem) -> bytes:
         buf = io.BytesIO()
         torch.save(prompt_obj, buf)
         return buf.getvalue()
 
-    def load_prompt(self, blob: bytes) -> Any:
+    def load_prompt(self, blob: bytes) -> VoiceClonePromptItem:
         buf = io.BytesIO(blob)
         # map_location="cpu" is safest; Qwen will move as needed internally.
         torch.serialization.add_safe_globals([VoiceClonePromptItem])
-        return torch.load(buf, map_location="cpu", weights_only=False)
+        return torch.load(buf, weights_only=False)
 
 
 model_registry = ModelRegistry()
