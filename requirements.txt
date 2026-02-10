@@ -4,3 +4,4 @@ uvicorn
 ffmpeg-python
 qwen-tts
 soundfile
+sqlmodel
