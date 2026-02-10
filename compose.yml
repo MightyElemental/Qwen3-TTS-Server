@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        FLASH_ATTN_MAX_JOBS: ${FLASH_ATTN_MAX_JOBS:-4}
     container_name: qwen3-tts-server
 
     ports:
@@ -12,6 +14,7 @@ services:
       HOST: "0.0.0.0"
       PORT: "8000"
       WORKERS: "1"
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
 
       # Data persistence
       DATA_DIR: "/app/data"
