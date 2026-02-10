@@ -5,6 +5,8 @@ import pickle
 from dataclasses import dataclass
 from typing import Any, Optional
 
+from torch import bfloat16
+
 # Qwen3-TTS official usage shows Qwen3TTSModel and methods like generate_voice_clone/design.
 # Install package "qwen-tts" per your requirements.txt.
 # Repo: https://github.com/QwenLM/Qwen3-TTS
@@ -21,9 +23,19 @@ class ModelRegistry:
         if self.loaded:
             return
         # Base model for prompt creation + voice clone
-        self.base = Qwen3TTSModel.from_pretrained(base_dir)
+        self.base = Qwen3TTSModel.from_pretrained(
+            base_dir,
+            device_map="cuda:0",
+            dtype=bfloat16,
+            attn_implementation="flash_attention_2",
+        )
         # VoiceDesign model for designvoice endpoint
-        self.voice_design = Qwen3TTSModel.from_pretrained(voice_design_dir)
+        self.voice_design = Qwen3TTSModel.from_pretrained(
+            voice_design_dir,
+            device_map="cuda:0",
+            dtype=bfloat16,
+            attn_implementation="flash_attention_2",
+        )
         self.loaded = True
 
     def dump_prompt(self, prompt_obj: Any) -> bytes:
