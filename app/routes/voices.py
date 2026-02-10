@@ -92,7 +92,11 @@ async def clonevoice(
     if model_registry.base is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
 
-    prompt_obj = model_registry.base.create_voice_clone_prompt(ref_audio=audio.path, ref_text=transcript)
+    prompt_obj = model_registry.base.create_voice_clone_prompt(
+        ref_audio=audio.path,
+        ref_text=transcript,
+        x_vector_only_mode=False,
+    )
     prompt_blob = model_registry.dump_prompt(prompt_obj)
 
     voice = Voice(
@@ -163,7 +167,11 @@ def designvoice(
         raise HTTPException(status_code=500, detail="ID missing")
 
     # 2) Compute clone prompt blob from the reference audio + reference text
-    prompt_obj = model_registry.base.create_voice_clone_prompt(ref_audio=audio.path, ref_text=STANDARD_EN_REFERENCE_SCRIPT)
+    prompt_obj = model_registry.base.create_voice_clone_prompt(
+        ref_audio=audio.path,
+        ref_text=STANDARD_EN_REFERENCE_SCRIPT,
+        x_vector_only_mode=False,
+    )
     prompt_blob = model_registry.dump_prompt(prompt_obj)
 
     voice = Voice(
