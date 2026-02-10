@@ -12,7 +12,7 @@ from typing import Optional
 
 
 def now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def hmac_sha256_hex(secret: str, value: str) -> str:
