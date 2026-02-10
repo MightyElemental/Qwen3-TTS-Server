@@ -12,7 +12,14 @@ from typing import Optional
 
 
 def now_utc() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(timezone.utc)
+
+
+def as_utc_aware(dt: datetime) -> datetime:
+    if dt.tzinfo is None:
+        # assume naive values are UTC (common convention with SQLite)
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def hmac_sha256_hex(secret: str, value: str) -> str:

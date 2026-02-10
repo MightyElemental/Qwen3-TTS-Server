@@ -9,7 +9,7 @@ from app.core.auth import get_settings
 from app.core.config import Settings
 from app.core.db import get_session
 from app.core.models import Invite, ApiKey
-from app.core.security import now_utc, hmac_sha256_hex, new_api_key, key_prefix
+from app.core.security import now_utc, as_utc_aware, hmac_sha256_hex, new_api_key, key_prefix
 
 router = APIRouter(prefix="/auth")
 
@@ -32,7 +32,7 @@ def exchange_invite_for_api_key(
     if inv.used_at is not None:
         raise HTTPException(status_code=403, detail="Invite already used")
 
-    if inv.expires_at is not None and now_utc() > inv.expires_at:
+    if inv.expires_at is not None and now_utc() > as_utc_aware(inv.expires_at):
         raise HTTPException(status_code=403, detail="Invite expired")
 
     # Generate API key (admin never sees this).
