@@ -1,5 +1,8 @@
 FROM pytorch/pytorch:2.10.0-cuda12.8-cudnn9-devel
 
+# Build-time arg (default 4)
+ARG FLASH_ATTN_MAX_JOBS=4
+
 # Faster, quieter Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -16,10 +19,12 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 
 # Python deps
 COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -U pip \
+RUN rm -f /usr/lib/python*/EXTERNALLY-MANAGED /usr/lib/*/EXTERNALLY-MANAGED || true \
+ && pip install --no-cache-dir -U pip setuptools wheel \
  && pip install --no-cache-dir -r /app/requirements.txt \
- && pip install --no-cache-dir --no-build-isolation flash-attn
+ && MAX_JOBS=${FLASH_ATTN_MAX_JOBS} pip install --no-cache-dir --no-build-isolation flash-attn
 
+COPY app /app/app
 COPY server.py /app/server.py
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
