@@ -11,7 +11,6 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 import soundfile as sf
-import numpy as np
 
 from app.core.auth import get_current_user, get_settings
 from app.core.config import Settings
@@ -47,6 +46,23 @@ class BatchTTSRequest(BaseModel):
     format: str = Field(default="wav", description="wav|mp3|ogg")
 
 
+def preprocess_text_single(text: str, settings: Settings):
+    text = text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Text must not be empty")
+    if len(text) > settings.max_text_len:
+        raise HTTPException(status_code=400, detail=f"Text too long (max {settings.max_text_len})")
+    return text
+
+def preprocess_text_batch(texts: list[str], settings: Settings):
+    texts = [t.strip() for t in texts]
+    if any(not t for t in texts):
+        raise HTTPException(status_code=400, detail="All texts must be non-empty")
+    if any(len(t) > settings.max_text_len for t in texts):
+        raise HTTPException(status_code=400, detail=f"Each text must be <= {settings.max_text_len} chars")
+    return texts
+
+
 @router.post("/tts")
 def tts(
     req: TTSRequest,
@@ -54,11 +70,7 @@ def tts(
     settings: Settings = Depends(get_settings),
     user=Depends(get_current_user),
 ):
-    text = req.text.strip()
-    if not text:
-        raise HTTPException(status_code=400, detail="Text must not be empty")
-    if len(text) > settings.max_text_len:
-        raise HTTPException(status_code=400, detail=f"Text too long (max {settings.max_text_len})")
+    text = preprocess_text_single(req.text, settings)
 
     ensure_supported_output(req.format)
 
@@ -146,11 +158,7 @@ def batchtts(
     if len(req.texts) > settings.max_batch_size:
         raise HTTPException(status_code=400, detail=f"Batch too large (max {settings.max_batch_size})")
 
-    texts = [t.strip() for t in req.texts]
-    if any(not t for t in texts):
-        raise HTTPException(status_code=400, detail="All texts must be non-empty")
-    if any(len(t) > settings.max_text_len for t in texts):
-        raise HTTPException(status_code=400, detail=f"Each text must be <= {settings.max_text_len} chars")
+    texts = preprocess_text_batch(req.texts, settings)
 
     ensure_supported_output(req.format)
 
