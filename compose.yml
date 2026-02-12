@@ -15,6 +15,7 @@ services:
       PORT: "8000"
       WORKERS: "1"
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      PYTORCH_ALLOC_CONF: "expandable_segments:True,max_split_size_mb:128"
 
       # Data persistence
       DATA_DIR: "/app/data"

@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 import soundfile as sf
+from torch import cuda
 
 from app.core.auth import get_current_user, get_settings
 from app.core.config import Settings
@@ -93,6 +94,7 @@ def tts(
         voice_clone_prompt=[prompt],
     )
     latency_ms = int((time.perf_counter() - t0) * 1000)
+    cuda.empty_cache()
 
     # Save to temp wav, convert if needed
     out_dir = settings.media_dir / "gens" / str(user.id)
@@ -183,6 +185,7 @@ def batchtts(
         voice_clone_prompt=[prompt],
     )
     latency_ms_total = int((time.perf_counter() - t0) * 1000)
+    cuda.empty_cache()
 
     # Update discount based on observed efficiency vs rolling single baseline
     total_chars = sum(len(t) for t in texts)
