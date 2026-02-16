@@ -118,6 +118,7 @@ def tts(
         store=req.store,
         requested_format=req.format,
         language=language,
+        temperature=req.temperature,
         tokens_used=tokens_used,
         latency_ms=latency_ms,
         status="ok",

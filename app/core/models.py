@@ -102,6 +102,7 @@ class Generation(SQLModel, table=True):
     store: bool = False
     requested_format: str = "wav"
     language: str = "auto"
+    temperature: float = 1.0
 
     tokens_used: int = 0
 
