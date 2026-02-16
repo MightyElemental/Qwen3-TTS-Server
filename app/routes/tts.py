@@ -192,6 +192,7 @@ def batchtts(
     # Update discount based on observed efficiency vs rolling single baseline
     total_chars = sum(len(t) for t in texts)
     discount_after = update_batch_discount_from_observation(session, settings, total_chars, latency_ms_total)
+    discount_after = round(discount_after, 3)
     tokens_used = tokens_for_batch(texts, discount_after)
 
     # Create batch row

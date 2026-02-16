@@ -37,7 +37,8 @@ def _set_float(session: Session, key: str, value: float) -> None:
 
 
 def get_batch_discount(session: Session, settings: Settings) -> float:
-    return _get_float(session, BATCH_DISCOUNT_KEY, settings.batch_discount_default)
+    raw_discount = _get_float(session, BATCH_DISCOUNT_KEY, settings.batch_discount_default)
+    return round(raw_discount, 5)
 
 
 def update_single_latency_per_char(session: Session, settings: Settings, chars: int, latency_ms: int) -> None:
@@ -84,5 +85,6 @@ def update_batch_discount_from_observation(
     alpha = settings.batch_discount_ewma_alpha
     new_discount = (1 - alpha) * current + alpha * efficiency
     new_discount = max(settings.batch_discount_min, min(settings.batch_discount_max, new_discount))
+    new_discount = round(new_discount, 5)
     _set_float(session, BATCH_DISCOUNT_KEY, new_discount)
     return new_discount
