@@ -1,3 +1,6 @@
+ninja
+packaging
+psutil
 huggingface_hub[cli]
 fastapi
 uvicorn
