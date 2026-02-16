@@ -32,15 +32,7 @@ router = APIRouter()
 
 
 class TTSRequest(BaseModel):
-    text: str = Field(..., min_length=1)
-    voice_id: int
-    store: bool = False
-    language: str = "auto"
-    format: str = Field(default="wav", description="wav|mp3|ogg")
-
-
-class BatchTTSRequest(BaseModel):
-    texts: list[str] = Field(..., min_length=1)
+    text: list[str] | str = Field(..., min_length=1)
     voice_id: int
     store: bool = False
     language: str = "auto"
@@ -71,6 +63,8 @@ def tts(
     settings: Settings = Depends(get_settings),
     user=Depends(get_current_user),
 ):
+    if isinstance(req.text, list):
+        raise HTTPException(status_code=400, detail="Single TTS endpoint expects a single text string, not a list")
     text = preprocess_text_single(req.text, settings)
 
     ensure_supported_output(req.format)
@@ -152,15 +146,17 @@ def tts(
 
 @router.post("/batchtts")
 def batchtts(
-    req: BatchTTSRequest,
+    req: TTSRequest,
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
     user=Depends(get_current_user),
 ):
-    if len(req.texts) > settings.max_batch_size:
+    if isinstance(req.text, str):
+        raise HTTPException(status_code=400, detail="Batch TTS endpoint expects a list of text strings, not a single string")
+    if len(req.text) > settings.max_batch_size:
         raise HTTPException(status_code=400, detail=f"Batch too large (max {settings.max_batch_size})")
 
-    texts = preprocess_text_batch(req.texts, settings)
+    texts = preprocess_text_batch(req.text, settings)
 
     ensure_supported_output(req.format)
 
