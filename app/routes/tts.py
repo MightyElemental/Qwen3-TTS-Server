@@ -36,6 +36,7 @@ class TTSRequest(BaseModel):
     voice_id: int
     store: bool = False
     language: str = "auto"
+    temperature: float = 1.0
     format: str = Field(default="wav", description="wav|mp3|ogg")
 
 
@@ -86,6 +87,7 @@ def tts(
         text=text,
         language=language,
         voice_clone_prompt=[prompt],
+        temperature=req.temperature,
     )
     latency_ms = int((time.perf_counter() - t0) * 1000)
     cuda.empty_cache()
@@ -179,6 +181,7 @@ def batchtts(
         text=texts,                     # batch list supported by Qwen3-TTS
         language=[language] * len(texts),
         voice_clone_prompt=[prompt],
+        temperature=req.temperature,
     )
     latency_ms_total = int((time.perf_counter() - t0) * 1000)
     cuda.empty_cache()
