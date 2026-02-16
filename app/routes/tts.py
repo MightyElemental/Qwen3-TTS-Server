@@ -155,6 +155,8 @@ def batchtts(
 ):
     if isinstance(req.text, str):
         raise HTTPException(status_code=400, detail="Batch TTS endpoint expects a list of text strings, not a single string")
+    if len(req.text) < settings.min_batch_size:
+        raise HTTPException(status_code=400, detail=f"Batch too small (min {settings.min_batch_size})")
     if len(req.text) > settings.max_batch_size:
         raise HTTPException(status_code=400, detail=f"Batch too large (max {settings.max_batch_size})")
 

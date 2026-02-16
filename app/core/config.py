@@ -29,6 +29,7 @@ class Settings:
     # Limits
     max_text_len: int = int(os.getenv("MAX_TEXT_LEN", "3000"))
     max_batch_size: int = int(os.getenv("MAX_BATCH_SIZE", "50"))
+    min_batch_size: int = int(os.getenv("MIN_BATCH_SIZE", "2"))
 
     # Batch discount calibration defaults
     batch_discount_default: float = float(os.getenv("BATCH_DISCOUNT_DEFAULT", "0.90"))
